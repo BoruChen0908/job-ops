@@ -645,6 +645,21 @@ const migrations = [
        ORDER BY se.occurred_at DESC, se.id DESC
        LIMIT 1
      ), 'applied') = 'closed'`,
+
+  // --- Recommended Terms (Dynamic Term Expansion) ---
+  `CREATE TABLE IF NOT EXISTS recommended_terms (
+    id TEXT PRIMARY KEY,
+    term TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'accepted', 'dismissed')),
+    confidence REAL NOT NULL DEFAULT 0,
+    occurrence_count INTEGER NOT NULL DEFAULT 1,
+    dismiss_count INTEGER NOT NULL DEFAULT 0,
+    source_job_ids TEXT NOT NULL DEFAULT '[]',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS idx_recommended_terms_term_unique ON recommended_terms(term COLLATE NOCASE)`,
+  `CREATE INDEX IF NOT EXISTS idx_recommended_terms_status ON recommended_terms(status)`,
 ];
 
 console.log("🔧 Running database migrations...");

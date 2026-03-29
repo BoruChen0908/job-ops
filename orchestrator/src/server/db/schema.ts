@@ -472,3 +472,39 @@ export type TracerLinkRow = typeof tracerLinks.$inferSelect;
 export type NewTracerLinkRow = typeof tracerLinks.$inferInsert;
 export type TracerClickEventRow = typeof tracerClickEvents.$inferSelect;
 export type NewTracerClickEventRow = typeof tracerClickEvents.$inferInsert;
+
+// --- Recommended Terms (Dynamic Term Expansion) ---
+
+export const RECOMMENDED_TERM_STATUSES = [
+  "pending",
+  "accepted",
+  "dismissed",
+] as const;
+
+export const recommendedTerms = sqliteTable(
+  "recommended_terms",
+  {
+    id: text("id").primaryKey(),
+    term: text("term").notNull(),
+    status: text("status", { enum: RECOMMENDED_TERM_STATUSES })
+      .notNull()
+      .default("pending"),
+    confidence: real("confidence").notNull().default(0),
+    occurrenceCount: integer("occurrence_count").notNull().default(1),
+    dismissCount: integer("dismiss_count").notNull().default(0),
+    sourceJobIds: text("source_job_ids").notNull().default("[]"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => ({
+    termUnique: uniqueIndex("idx_recommended_terms_term_unique").on(table.term),
+    statusIndex: index("idx_recommended_terms_status").on(table.status),
+  }),
+);
+
+export type RecommendedTermRow = typeof recommendedTerms.$inferSelect;
+export type NewRecommendedTermRow = typeof recommendedTerms.$inferInsert;

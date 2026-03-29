@@ -41,6 +41,7 @@ COPY extractors/gradcracker/package*.json ./extractors/gradcracker/
 COPY extractors/startupjobs/package*.json ./extractors/startupjobs/
 COPY extractors/workingnomads/package*.json ./extractors/workingnomads/
 COPY extractors/ukvisajobs/package*.json ./extractors/ukvisajobs/
+COPY extractors/simplifyjobs/package*.json ./extractors/simplifyjobs/
 
 # Install Node dependencies with npm cache (dev deps needed for build)
 RUN --mount=type=cache,target=/root/.npm \
@@ -64,6 +65,7 @@ COPY extractors/jobspy ./extractors/jobspy
 COPY extractors/startupjobs ./extractors/startupjobs
 COPY extractors/workingnomads ./extractors/workingnomads
 COPY extractors/ukvisajobs ./extractors/ukvisajobs
+COPY extractors/simplifyjobs ./extractors/simplifyjobs
 
 # Build documentation site bundle
 WORKDIR /app/docs-site
@@ -112,6 +114,7 @@ COPY extractors/gradcracker/package*.json ./extractors/gradcracker/
 COPY extractors/startupjobs/package*.json ./extractors/startupjobs/
 COPY extractors/workingnomads/package*.json ./extractors/workingnomads/
 COPY extractors/ukvisajobs/package*.json ./extractors/ukvisajobs/
+COPY extractors/simplifyjobs/package*.json ./extractors/simplifyjobs/
 
 # Install production Node dependencies only
 RUN --mount=type=cache,target=/root/.npm \
@@ -131,6 +134,7 @@ COPY extractors/jobspy ./extractors/jobspy
 COPY extractors/startupjobs ./extractors/startupjobs
 COPY extractors/workingnomads ./extractors/workingnomads
 COPY extractors/ukvisajobs ./extractors/ukvisajobs
+COPY extractors/simplifyjobs ./extractors/simplifyjobs
 
 # Reuse Camoufox binaries from builder instead of fetching again
 COPY --from=builder /root/.cache/camoufox /root/.cache/camoufox

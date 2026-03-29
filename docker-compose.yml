@@ -62,6 +62,9 @@ services:
         - path: ./extractors/jobspy
           target: /app/extractors/jobspy
           action: sync+restart
+        - path: ./extractors/simplifyjobs/src
+          target: /app/extractors/simplifyjobs/src
+          action: sync+restart
 
 # Volumes for data persistence
 volumes:

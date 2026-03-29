@@ -9,6 +9,7 @@ export type PipelineStep =
   | "crawling"
   | "importing"
   | "scoring"
+  | "extracting_terms"
   | "processing"
   | "completed"
   | "cancelled"
@@ -406,6 +407,23 @@ export const progressHelpers = {
       totalToProcess: 0,
       jobsProcessed: 0,
       currentJob: undefined,
+    }),
+
+  extractingTermsStart: (scoredJobCount: number) =>
+    updateProgress({
+      step: "extracting_terms",
+      message: `Analyzing ${scoredJobCount} scored jobs for new search terms...`,
+      detail: "Extracting terms from job descriptions via LLM",
+    }),
+
+  extractingTermsComplete: (newCount: number, updatedCount: number) =>
+    updateProgress({
+      step: "extracting_terms",
+      message:
+        newCount + updatedCount > 0
+          ? `Found ${newCount} new terms, updated ${updatedCount} existing.`
+          : "No new search terms found.",
+      detail: "Term extraction complete",
     }),
 
   processingJob: (

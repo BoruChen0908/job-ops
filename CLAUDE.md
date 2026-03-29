@@ -13,14 +13,14 @@ npm monorepo with 4 workspaces:
 | Workspace | Path | Tech |
 |-----------|------|------|
 | orchestrator | `orchestrator/` | React 18 + Vite (client), Express (server), SQLite + Drizzle ORM |
-| extractors | `extractors/*` | TypeScript plugin modules (7 built-in + custom) |
+| extractors | `extractors/*` | TypeScript plugin modules (7 built-in + simplifyjobs) |
 | shared | `shared/` | Shared types, Zod schemas, prompt templates |
 | docs-site | `docs-site/` | Docusaurus |
 
 ### Pipeline flow
 
 ```
-discover (extractors) → import (SQLite) → score (LLM) → select (topN) → tailor (LLM) → PDF (RxResume API)
+discover (extractors) → import (SQLite) → score (LLM) → extract terms (LLM) → select (topN) → tailor (LLM) → PDF (RxResume API)
 ```
 
 ### Extractor plugin system
@@ -31,7 +31,7 @@ Extractors are auto-discovered from `extractors/*/src/manifest.ts`. To add a new
 2. Create `extractors/{name}/package.json` (type: "module"), `tsconfig.json`, `src/manifest.ts`, `src/run.ts`
 3. Implement `ExtractorManifest` interface — the registry discovers it automatically
 
-No changes needed to orchestrator code.
+Also add source ID to `orchestrator/src/client/pages/orchestrator/utils.ts` (`getEnabledSources` whitelist) and to `Dockerfile` build/production stages.
 
 ## Tech Stack
 
@@ -94,13 +94,18 @@ If better-sqlite3 ABI mismatch: `npm --workspace orchestrator rebuild better-sql
 - Commits: conventional commits (`feat:`, `fix:`, `chore:`)
 - Error handling: structured `{ ok, data/error, meta.requestId }` (see `AGENTS.md`)
 - Patterns: Repository (data access) → Service (business logic) → Route (API)
+- Vite aliases: `@/` → `src/`, `@client/` → `src/client/`, `@server/` → `src/server/`. Client-side hooks/queries use `@client/hooks/...`, not `@/hooks/...`
 - See `AGENTS.md` for API response format, logging rules, SSE standards
 
-## Fork-specific customizations (planned)
+## Fork-specific customizations
 
-1. **New extractors:** SimplifyJobs GitHub JSON, SpeedyApply AI-College-Jobs, AI Safety job boards
+### Done
+1. **SimplifyJobs extractor** — fetches intern/new-grad listings from SimplifyJobs GitHub JSON repos (Summer2026-Internships + New-Grad-Positions). Filters by active/visible status and search terms.
+2. **Dynamic term expansion** — after scoring, LLM analyzes top JDs to discover new search terms. Stored in `recommended_terms` table, shown as accept/dismiss chips in Run Pipeline dialog. Accepted terms auto-merge into next pipeline run's search terms.
+
+### Planned
+1. **More extractors:** SpeedyApply AI-College-Jobs, AI Safety job boards (aisafety.com/jobs, 80000hours.org)
 2. **Scorer prompt tuning:** AI Safety keyword weighting in suitability scoring
-3. **Dynamic term expansion:** LLM generates new search terms from discovered JDs
 
 ## Git workflow
 
@@ -121,4 +126,6 @@ If better-sqlite3 ABI mismatch: `npm --workspace orchestrator rebuild better-sql
 | Change DB schema | `orchestrator/src/server/db/schema.ts` |
 | Change pipeline steps | `orchestrator/src/server/pipeline/steps/` |
 | Configure LLM providers | `orchestrator/src/server/services/llm/providers/` |
+| Change term expansion | `orchestrator/src/server/services/term-expansion.ts` + `pipeline/steps/extract-terms.ts` |
+| Manage recommended terms | `orchestrator/src/server/repositories/recommended-terms.ts` + `api/routes/recommended-terms.ts` |
 | Understand shared types | `shared/src/types/` (extractors, jobs, settings) |

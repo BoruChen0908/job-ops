@@ -26,6 +26,7 @@ import { generateTailoring } from "../services/summary";
 import { progressHelpers, resetProgress } from "./progress";
 import {
   discoverJobsStep,
+  extractTermsStep,
   importJobsStep,
   loadProfileStep,
   notifyPipelineWebhookStep,
@@ -123,6 +124,14 @@ export async function runPipeline(
 
       ensureNotCancelled();
       const { unprocessedJobs, scoredJobs } = await scoreJobsStep({
+        profile,
+        shouldCancel: () => cancelRequestedAt !== null,
+      });
+
+      // Term extraction step (non-blocking — errors won't halt the pipeline)
+      ensureNotCancelled();
+      await extractTermsStep({
+        scoredJobs,
         profile,
         shouldCancel: () => cancelRequestedAt !== null,
       });

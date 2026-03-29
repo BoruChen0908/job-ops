@@ -109,4 +109,9 @@ export const queryKeys = {
     all: ["backups"] as const,
     list: () => [...queryKeys.backups.all, "list"] as const,
   },
+  recommendedTerms: {
+    all: ["recommended-terms"] as const,
+    list: (status?: string) =>
+      [...queryKeys.recommendedTerms.all, "list", { status }] as const,
+  },
 } as const;

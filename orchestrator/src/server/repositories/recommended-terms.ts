@@ -146,7 +146,6 @@ export async function batchUpdateStatus(
   status: "accepted" | "dismissed",
 ): Promise<number> {
   if (ids.length === 0) return 0;
-  const now = new Date().toISOString();
   let updated = 0;
 
   for (const id of ids) {

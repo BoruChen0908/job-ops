@@ -1,4 +1,5 @@
 export { discoverJobsStep } from "./discover-jobs";
+export { extractTermsStep } from "./extract-terms";
 export { importJobsStep } from "./import-jobs";
 export { loadProfileStep } from "./load-profile";
 export { notifyPipelineWebhookStep } from "./notify-webhook";

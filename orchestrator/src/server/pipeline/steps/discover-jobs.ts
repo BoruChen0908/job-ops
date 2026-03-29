@@ -2,6 +2,7 @@ import { logger } from "@infra/logger";
 import { sanitizeUnknown } from "@infra/sanitize";
 import { getExtractorRegistry } from "@server/extractors/registry";
 import { getAllJobUrls } from "@server/repositories/jobs";
+import * as recommendedTermsRepo from "@server/repositories/recommended-terms";
 import * as settingsRepo from "@server/repositories/settings";
 import { asyncPool } from "@server/utils/async-pool";
 import {
@@ -104,6 +105,29 @@ export async function discoverJobsStep(args: {
       .split("|")
       .map((term) => term.trim())
       .filter(Boolean);
+  }
+
+  // Merge accepted recommended terms into search terms (case-insensitive dedup)
+  try {
+    const acceptedTerms = await recommendedTermsRepo.getAcceptedTerms();
+    if (acceptedTerms.length > 0) {
+      const existingLower = new Set(searchTerms.map((t) => t.toLowerCase()));
+      const newTerms = acceptedTerms
+        .map((t) => t.term)
+        .filter((t) => !existingLower.has(t.toLowerCase()));
+      if (newTerms.length > 0) {
+        searchTerms = [...searchTerms, ...newTerms];
+        logger.info("Merged accepted recommended terms into search", {
+          step: "discover-jobs",
+          addedTerms: newTerms,
+          totalSearchTerms: searchTerms.length,
+        });
+      }
+    }
+  } catch (error) {
+    logger.warn("Failed to load accepted recommended terms, continuing without", {
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 
   const selectedCountry = normalizeCountryKey(

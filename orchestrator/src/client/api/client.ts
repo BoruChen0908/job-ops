@@ -1509,3 +1509,51 @@ export async function deleteBackup(filename: string): Promise<void> {
     method: "DELETE",
   });
 }
+
+// ── Recommended Terms ────────────────────────────────────────────
+
+export interface RecommendedTerm {
+  id: string;
+  term: string;
+  status: string;
+  confidence: number;
+  occurrenceCount: number;
+  dismissCount: number;
+  sourceJobIds: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function getRecommendedTerms(
+  status?: string,
+): Promise<{ terms: RecommendedTerm[]; count: number }> {
+  const params = status ? `?status=${encodeURIComponent(status)}` : "";
+  return fetchApi<{ terms: RecommendedTerm[]; count: number }>(
+    `/recommended-terms${params}`,
+  );
+}
+
+export async function updateRecommendedTermStatus(
+  id: string,
+  status: "accepted" | "dismissed",
+): Promise<{ term: RecommendedTerm }> {
+  return fetchApi<{ term: RecommendedTerm }>(
+    `/recommended-terms/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    },
+  );
+}
+
+export async function batchUpdateRecommendedTerms(
+  ids: string[],
+  status: "accepted" | "dismissed",
+): Promise<{ updated: number }> {
+  return fetchApi<{ updated: number }>("/recommended-terms/batch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids, status }),
+  });
+}

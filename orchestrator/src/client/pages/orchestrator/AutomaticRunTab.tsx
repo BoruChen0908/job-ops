@@ -44,6 +44,7 @@ import {
   WORKPLACE_TYPE_OPTIONS,
   type WorkplaceType,
 } from "./automatic-run";
+import { RecommendedTermsChips } from "./RecommendedTermsChips";
 import { TokenizedInput } from "./TokenizedInput";
 
 interface AutomaticRunTabProps {
@@ -589,6 +590,7 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
               helperText="Add multiple terms by separating with commas or pressing Enter."
               removeLabelPrefix="Remove"
             />
+            <RecommendedTermsChips />
           </CardContent>
         </Card>
 

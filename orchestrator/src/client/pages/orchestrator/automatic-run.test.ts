@@ -29,6 +29,7 @@ describe("automatic-run utilities", () => {
         country: "united kingdom",
         cityLocations: [],
         workplaceTypes: ["remote", "hybrid", "onsite"],
+        maxJobAgeDays: 0,
       },
       sources: ["indeed", "linkedin", "gradcracker", "ukvisajobs"],
     });
@@ -74,6 +75,7 @@ describe("automatic-run utilities", () => {
         country: "united kingdom",
         cityLocations: [],
         workplaceTypes: ["remote", "hybrid", "onsite"],
+        maxJobAgeDays: 0,
       },
       sources: ["indeed", "linkedin", "gradcracker", "ukvisajobs"],
     });
@@ -102,6 +104,7 @@ describe("automatic-run utilities", () => {
         country: "united kingdom",
         cityLocations: [],
         workplaceTypes: ["remote", "hybrid", "onsite"],
+        maxJobAgeDays: 0,
       },
       sources: ["adzuna"],
     });
@@ -120,6 +123,7 @@ describe("automatic-run utilities", () => {
         country: "united kingdom",
         cityLocations: [],
         workplaceTypes: ["remote", "hybrid", "onsite"],
+        maxJobAgeDays: 0,
       },
       sources: ["hiringcafe"],
     });
@@ -138,6 +142,7 @@ describe("automatic-run utilities", () => {
         country: "united kingdom",
         cityLocations: [],
         workplaceTypes: ["remote", "hybrid", "onsite"],
+        maxJobAgeDays: 0,
       },
       sources: ["startupjobs"],
     });
@@ -156,6 +161,7 @@ describe("automatic-run utilities", () => {
         country: "united kingdom",
         cityLocations: [],
         workplaceTypes: ["remote", "hybrid", "onsite"],
+        maxJobAgeDays: 0,
       },
       sources: ["workingnomads"],
     });

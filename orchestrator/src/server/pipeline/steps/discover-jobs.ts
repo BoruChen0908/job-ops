@@ -125,9 +125,12 @@ export async function discoverJobsStep(args: {
       }
     }
   } catch (error) {
-    logger.warn("Failed to load accepted recommended terms, continuing without", {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    logger.warn(
+      "Failed to load accepted recommended terms, continuing without",
+      {
+        error: error instanceof Error ? error.message : String(error),
+      },
+    );
   }
 
   const selectedCountry = normalizeCountryKey(
@@ -362,11 +365,43 @@ export async function discoverJobsStep(args: {
     });
   }
 
-  if (args.shouldCancel?.()) {
-    return { discoveredJobs: filteredDiscoveredJobs, sourceErrors };
+  const maxJobAgeDaysRaw = settings.maxJobAgeDays;
+  const maxJobAgeDays =
+    maxJobAgeDaysRaw !== undefined && maxJobAgeDaysRaw !== ""
+      ? Number.parseInt(maxJobAgeDaysRaw, 10)
+      : 0;
+  let dateFilteredJobs = filteredDiscoveredJobs;
+
+  if (maxJobAgeDays > 0) {
+    const cutoffDate = new Date();
+    cutoffDate.setUTCDate(cutoffDate.getUTCDate() - maxJobAgeDays);
+    cutoffDate.setUTCHours(0, 0, 0, 0);
+    const cutoffMs = cutoffDate.getTime();
+
+    dateFilteredJobs = filteredDiscoveredJobs.filter((job) => {
+      if (!job.datePosted) return true;
+      const postedMs = new Date(job.datePosted).getTime();
+      if (Number.isNaN(postedMs)) return true;
+      return postedMs >= cutoffMs;
+    });
+
+    const dateDroppedCount =
+      filteredDiscoveredJobs.length - dateFilteredJobs.length;
+    if (dateDroppedCount > 0) {
+      logger.info("Dropped discovered jobs older than max age", {
+        step: "discover-jobs",
+        droppedCount: dateDroppedCount,
+        maxJobAgeDays,
+        cutoffDate: cutoffDate.toISOString(),
+      });
+    }
   }
 
-  if (filteredDiscoveredJobs.length === 0 && sourceErrors.length > 0) {
+  if (args.shouldCancel?.()) {
+    return { discoveredJobs: dateFilteredJobs, sourceErrors };
+  }
+
+  if (dateFilteredJobs.length === 0 && sourceErrors.length > 0) {
     throw new Error(`All sources failed: ${sourceErrors.join("; ")}`);
   }
 
@@ -374,7 +409,7 @@ export async function discoverJobsStep(args: {
     logger.warn("Some discovery sources failed", { sourceErrors });
   }
 
-  progressHelpers.crawlingComplete(filteredDiscoveredJobs.length);
+  progressHelpers.crawlingComplete(dateFilteredJobs.length);
 
-  return { discoveredJobs: filteredDiscoveredJobs, sourceErrors };
+  return { discoveredJobs: dateFilteredJobs, sourceErrors };
 }

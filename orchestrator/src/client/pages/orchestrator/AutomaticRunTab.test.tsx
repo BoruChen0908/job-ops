@@ -1,8 +1,18 @@
 import { createAppSettings } from "@shared/testing/factories.js";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AutomaticRunTab } from "./AutomaticRunTab";
+
+function renderWithQueryClient(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+  );
+}
 
 const { getDetectedCountryKeyMock } = vi.hoisted(() => ({
   getDetectedCountryKeyMock: vi.fn((): string | null => null),
@@ -34,7 +44,7 @@ describe("AutomaticRunTab", () => {
   it("uses detected country when location settings are still defaults", () => {
     getDetectedCountryKeyMock.mockReturnValueOnce("united states");
 
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings()}
@@ -53,7 +63,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("loads persisted country from settings", () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -84,7 +94,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("maps legacy usa/ca country to United States in the picker", () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -117,7 +127,7 @@ describe("AutomaticRunTab", () => {
   it("disables and prunes UK-only sources for non-UK country", async () => {
     const onSetPipelineSources = vi.fn();
 
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -151,7 +161,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("shows disabled source guidance copy for UK-only source", async () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -186,7 +196,7 @@ describe("AutomaticRunTab", () => {
   it("disables glassdoor for unsupported countries with guidance copy", async () => {
     const onSetPipelineSources = vi.fn();
 
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -225,7 +235,7 @@ describe("AutomaticRunTab", () => {
   it("disables glassdoor for supported countries until city is provided", async () => {
     const onSetPipelineSources = vi.fn();
 
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -266,7 +276,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("does not show legacy country-only city defaults as selected cities", () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -299,7 +309,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("does not remove existing search terms when Backspace is pressed on an empty input", () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -337,7 +347,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("loads multiple saved cities and keeps glassdoor enabled", () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -379,7 +389,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("loads saved workplace types from settings", () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -406,7 +416,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("requires at least one workplace type", async () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings()}
@@ -433,7 +443,7 @@ describe("AutomaticRunTab", () => {
   });
 
   it("shows JobSpy guidance when non-remote workplace types are selected", () => {
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings({
@@ -464,7 +474,7 @@ describe("AutomaticRunTab", () => {
   it("submits workplace types in onSaveAndRun values", async () => {
     const onSaveAndRun = vi.fn().mockResolvedValue(undefined);
 
-    render(
+    renderWithQueryClient(
       <AutomaticRunTab
         open
         settings={createAppSettings()}

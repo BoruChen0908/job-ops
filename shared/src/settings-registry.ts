@@ -13,7 +13,7 @@ function parseNonEmptyStringOrNull(raw: string | undefined): string | null {
 }
 
 function parseIntOrNull(raw: string | undefined): number | null {
-  if (!raw) return null;
+  if (raw === undefined || raw === "") return null;
   const parsed = parseInt(raw, 10);
   return Number.isNaN(parsed) ? null : parsed;
 }
@@ -314,6 +314,13 @@ export const settingsRegistry = {
     ],
     parse: parseWorkplaceTypesOrNull,
     serialize: serializeNullableJsonArray,
+  },
+  maxJobAgeDays: {
+    kind: "typed" as const,
+    schema: z.number().int().min(0).max(365),
+    default: (): number => 0,
+    parse: parseIntOrNull,
+    serialize: serializeNullableNumber,
   },
   blockedCompanyKeywords: {
     kind: "typed" as const,

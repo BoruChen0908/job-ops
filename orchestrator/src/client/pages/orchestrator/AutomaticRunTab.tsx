@@ -21,6 +21,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -36,6 +43,7 @@ import {
   type AutomaticRunValues,
   calculateAutomaticEstimate,
   loadAutomaticRunMemory,
+  MAX_JOB_AGE_OPTIONS,
   normalizeWorkplaceTypes,
   parseCityLocationsInput,
   parseCityLocationsSetting,
@@ -66,6 +74,7 @@ const DEFAULT_VALUES: AutomaticRunValues = {
   country: "united kingdom",
   cityLocations: [],
   workplaceTypes: ["remote", "hybrid", "onsite"],
+  maxJobAgeDays: 0,
 };
 
 interface AutomaticRunFormValues {
@@ -78,6 +87,7 @@ interface AutomaticRunFormValues {
   workplaceTypes: WorkplaceType[];
   searchTerms: string[];
   searchTermDraft: string;
+  maxJobAgeDays: string;
 }
 
 type AutomaticPresetSelection = AutomaticPresetId | "custom";
@@ -174,6 +184,7 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
       workplaceTypes: DEFAULT_VALUES.workplaceTypes,
       searchTerms: DEFAULT_VALUES.searchTerms,
       searchTermDraft: "",
+      maxJobAgeDays: String(DEFAULT_VALUES.maxJobAgeDays),
     },
   });
 
@@ -186,6 +197,7 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
   const workplaceTypes = watch("workplaceTypes");
   const searchTerms = watch("searchTerms");
   const searchTermDraft = watch("searchTermDraft");
+  const maxJobAgeDaysInput = watch("maxJobAgeDays");
 
   useEffect(() => {
     if (!open) return;
@@ -230,6 +242,14 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
       settings?.workplaceTypes?.value,
     );
 
+    const rawMaxJobAgeDays =
+      settings?.maxJobAgeDays?.value ?? DEFAULT_VALUES.maxJobAgeDays;
+    const rememberedMaxJobAgeDays = MAX_JOB_AGE_OPTIONS.some(
+      (opt) => opt.value === rawMaxJobAgeDays,
+    )
+      ? rawMaxJobAgeDays
+      : DEFAULT_VALUES.maxJobAgeDays;
+
     reset({
       topN: String(topN),
       minSuitabilityScore: String(minSuitabilityScore),
@@ -240,6 +260,7 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
       workplaceTypes: rememberedWorkplaceTypes,
       searchTerms: settings?.searchTerms?.value ?? DEFAULT_VALUES.searchTerms,
       searchTermDraft: "",
+      maxJobAgeDays: String(rememberedMaxJobAgeDays),
     });
     setAdvancedOpen(false);
   }, [open, settings, reset]);
@@ -259,6 +280,12 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
       cityLocations,
       workplaceTypes: normalizeWorkplaceTypes(workplaceTypes),
       searchTerms,
+      maxJobAgeDays: toNumber(
+        maxJobAgeDaysInput,
+        0,
+        365,
+        DEFAULT_VALUES.maxJobAgeDays,
+      ),
     };
   }, [
     topNInput,
@@ -268,6 +295,7 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
     cityLocations,
     workplaceTypes,
     searchTerms,
+    maxJobAgeDaysInput,
   ]);
 
   const workplaceTypeSelectionInvalid = workplaceTypes.length === 0;
@@ -495,6 +523,31 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
                           setValue("runBudget", event.target.value)
                         }
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="max-job-age">Job posted within</Label>
+                      <Select
+                        value={maxJobAgeDaysInput}
+                        onValueChange={(value) =>
+                          setValue("maxJobAgeDays", value, {
+                            shouldDirty: true,
+                          })
+                        }
+                      >
+                        <SelectTrigger id="max-job-age" className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {MAX_JOB_AGE_OPTIONS.map((option) => (
+                            <SelectItem
+                              key={option.value}
+                              value={String(option.value)}
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2 md:col-span-3">
                       <Label htmlFor="city-locations-input">Cities</Label>

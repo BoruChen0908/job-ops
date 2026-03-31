@@ -181,6 +181,7 @@ export function usePipelineControls(
         startupjobsMaxJobsPerTerm: limits.startupjobsMaxJobsPerTerm,
         jobspyCountryIndeed: values.country,
         searchCities,
+        maxJobAgeDays: values.maxJobAgeDays,
       });
       await refreshSettings();
       await startPipelineRun({

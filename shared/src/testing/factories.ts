@@ -165,6 +165,11 @@ export const createAppSettings = (
     default: ["remote", "hybrid", "onsite"],
     override: null,
   },
+  maxJobAgeDays: {
+    value: 0,
+    default: 0,
+    override: null,
+  },
   blockedCompanyKeywords: {
     value: [],
     default: [],

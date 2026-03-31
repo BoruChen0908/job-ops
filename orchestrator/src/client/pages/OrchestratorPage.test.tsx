@@ -64,6 +64,7 @@ let mockAutomaticRunValues: AutomaticRunValues = {
   country: "united kingdom",
   cityLocations: [],
   workplaceTypes: ["remote", "hybrid", "onsite"],
+  maxJobAgeDays: 0,
 };
 
 const jobFixture = createJob({
@@ -404,6 +405,7 @@ describe("OrchestratorPage", () => {
       country: "united kingdom",
       cityLocations: [],
       workplaceTypes: ["remote", "hybrid", "onsite"],
+      maxJobAgeDays: 0,
     };
   });
 
@@ -759,6 +761,7 @@ describe("OrchestratorPage", () => {
         startupjobsMaxJobsPerTerm: 150,
         jobspyCountryIndeed: "united kingdom",
         searchCities: null,
+        maxJobAgeDays: 0,
       });
     });
     expect(api.runPipeline).toHaveBeenCalledWith({
@@ -784,6 +787,7 @@ describe("OrchestratorPage", () => {
       country: "united kingdom",
       cityLocations: ["London", "Manchester"],
       workplaceTypes: ["remote", "hybrid", "onsite"],
+      maxJobAgeDays: 0,
     };
 
     render(
@@ -819,6 +823,7 @@ describe("OrchestratorPage", () => {
       country: "united kingdom",
       cityLocations: ["Leeds", "Manchester"],
       workplaceTypes: ["remote", "hybrid", "onsite"],
+      maxJobAgeDays: 0,
     };
 
     render(
@@ -854,6 +859,7 @@ describe("OrchestratorPage", () => {
       country: "united kingdom",
       cityLocations: ["Leeds", "Manchester"],
       workplaceTypes: ["remote", "hybrid", "onsite"],
+      maxJobAgeDays: 0,
     };
 
     render(
@@ -961,6 +967,7 @@ describe("OrchestratorPage", () => {
       country: "united states",
       cityLocations: [],
       workplaceTypes: ["remote", "hybrid", "onsite"],
+      maxJobAgeDays: 0,
     };
 
     render(

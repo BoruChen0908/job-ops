@@ -156,6 +156,7 @@ export interface AppSettings {
   startupjobsMaxJobsPerTerm: Resolved<number>;
   searchTerms: Resolved<string[]>;
   workplaceTypes: Resolved<Array<"remote" | "hybrid" | "onsite">>;
+  maxJobAgeDays: Resolved<number>;
   blockedCompanyKeywords: Resolved<string[]>;
   scoringInstructions: Resolved<string>;
   ghostwriterSystemPromptTemplate: Resolved<string>;

@@ -23,8 +23,10 @@
     "release:set-version": "node ./scripts/set-orchestrator-version.mjs",
     "knip": "knip"
   },
+  "optionalDependencies": {
+    "@biomejs/cli-win32-x64": "^2.4.10"
+  },
   "devDependencies": {
-    "@biomejs/cli-win32-x64": "^2.4.10",
     "@types/node": "^25.2.3",
     "knip": "^5.83.1",
     "tsx": "^4.19.2",

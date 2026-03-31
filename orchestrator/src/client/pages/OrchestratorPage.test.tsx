@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as api from "../api";
+import { _resetKeyboardAvailabilityForTests } from "../hooks/useKeyboardAvailability";
 import { renderWithQueryClient } from "../test/renderWithQueryClient";
 import { OrchestratorPage } from "./OrchestratorPage";
 import type { AutomaticRunValues } from "./orchestrator/automatic-run";
@@ -99,9 +100,9 @@ const processingJob = createJob({
 let mockJobs = [jobFixture, job2, processingJob];
 let mockSelectedJob: Job | null = jobFixture;
 
-const createMatchMedia = (matches: boolean) =>
+const createMatchMedia = (matches: boolean | Record<string, boolean>) =>
   vi.fn().mockImplementation((query: string) => ({
-    matches,
+    matches: typeof matches === "boolean" ? matches : (matches[query] ?? false),
     media: query,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
@@ -388,6 +389,7 @@ const pressKeyOn = (
 describe("OrchestratorPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    _resetKeyboardAvailabilityForTests();
     localStorage.clear();
     localStorage.setItem("has-seen-keyboard-shortcuts", "true");
     mockDemoMode = false;
@@ -1152,6 +1154,47 @@ describe("OrchestratorPage", () => {
     );
 
     expect(screen.getByTestId("help-dialog")).toHaveTextContent("closed");
+  });
+
+  it("does not auto-open the keyboard shortcut dialog on touch-only devices", () => {
+    localStorage.removeItem("has-seen-keyboard-shortcuts");
+    window.matchMedia = createMatchMedia({
+      "(min-width: 1024px)": true,
+      "(any-hover: hover)": false,
+      "(any-pointer: fine)": false,
+    }) as unknown as typeof window.matchMedia;
+
+    const maxTouchPointsDescriptor = Object.getOwnPropertyDescriptor(
+      Navigator.prototype,
+      "maxTouchPoints",
+    );
+    Object.defineProperty(Navigator.prototype, "maxTouchPoints", {
+      configurable: true,
+      get: () => 5,
+    });
+
+    try {
+      render(
+        <MemoryRouter initialEntries={["/jobs/ready"]}>
+          <Routes>
+            <Route path="/jobs/:tab" element={<OrchestratorPage />} />
+            <Route path="/jobs/:tab/:jobId" element={<OrchestratorPage />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+
+      expect(screen.getByTestId("help-dialog")).toHaveTextContent("closed");
+    } finally {
+      if (maxTouchPointsDescriptor) {
+        Object.defineProperty(
+          Navigator.prototype,
+          "maxTouchPoints",
+          maxTouchPointsDescriptor,
+        );
+      } else {
+        Reflect.deleteProperty(Navigator.prototype, "maxTouchPoints");
+      }
+    }
   });
 
   it("disables other shortcuts while help dialog is open", async () => {

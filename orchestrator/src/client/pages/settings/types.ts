@@ -66,4 +66,5 @@ export type PromptTemplatesValues = {
   ghostwriterSystemPromptTemplate: EffectiveDefault<string>;
   tailoringPromptTemplate: EffectiveDefault<string>;
   scoringPromptTemplate: EffectiveDefault<string>;
+  termExpansionPromptTemplate: EffectiveDefault<string>;
 };

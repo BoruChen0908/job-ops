@@ -590,7 +590,19 @@ export const AutomaticRunTab: React.FC<AutomaticRunTabProps> = ({
               helperText="Add multiple terms by separating with commas or pressing Enter."
               removeLabelPrefix="Remove"
             />
-            <RecommendedTermsChips />
+            <RecommendedTermsChips
+              onTermAccepted={(term) => {
+                const lower = term.toLowerCase();
+                const alreadyExists = searchTerms.some(
+                  (existing) => existing.toLowerCase() === lower,
+                );
+                if (!alreadyExists) {
+                  setValue("searchTerms", [...searchTerms, term], {
+                    shouldDirty: true,
+                  });
+                }
+              }}
+            />
           </CardContent>
         </Card>
 

@@ -6,7 +6,13 @@ import { useRecommendedTerms, useUpdateRecommendedTermMutation } from "@client/h
 
 const COLLAPSED_LIMIT = 5;
 
-export function RecommendedTermsChips() {
+interface RecommendedTermsChipsProps {
+  onTermAccepted?: (term: string) => void;
+}
+
+export function RecommendedTermsChips({
+  onTermAccepted,
+}: RecommendedTermsChipsProps) {
   const { data, isLoading } = useRecommendedTerms("pending");
   const updateMutation = useUpdateRecommendedTermMutation();
   const [expanded, setExpanded] = useState(false);
@@ -45,12 +51,13 @@ export function RecommendedTermsChips() {
                 variant="outline"
                 className="h-auto rounded-full px-2 py-1 text-xs text-muted-foreground"
                 disabled={updateMutation.isPending}
-                onClick={() =>
+                onClick={() => {
                   updateMutation.mutate({
                     id: term.id,
                     status: "accepted",
-                  })
-                }
+                  });
+                  onTermAccepted?.(term.term);
+                }}
                 aria-label={`Accept "${term.term}"`}
               >
                 <Check className="mr-0.5 h-3 w-3 text-green-500" />

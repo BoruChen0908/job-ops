@@ -3,6 +3,7 @@ import type {
   ExtractorManifest,
   ExtractorProgressEvent,
 } from "@shared/types/extractors";
+import { filterExistingJobs } from "@shared/utils/filter-existing-jobs.js";
 import { runHiringCafe } from "./src/run";
 
 function toProgress(event: {
@@ -56,6 +57,8 @@ export const manifest: ExtractorManifest = {
       return { success: true, jobs: [] };
     }
 
+    const existingJobUrls = await context.getExistingJobUrls?.();
+
     const maxJobsPerTerm = context.settings.jobspyResultsWanted
       ? parseInt(context.settings.jobspyResultsWanted, 10)
       : 200;
@@ -87,9 +90,10 @@ export const manifest: ExtractorManifest = {
       };
     }
 
+    const { jobs } = filterExistingJobs(result.jobs, existingJobUrls, "Hiring Cafe");
     return {
       success: true,
-      jobs: result.jobs,
+      jobs,
     };
   },
 };

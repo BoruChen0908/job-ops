@@ -2,6 +2,7 @@ import type {
   ExtractorManifest,
   ExtractorRuntimeContext,
 } from "@shared/types/extractors";
+import { filterExistingJobs } from "@shared/utils/filter-existing-jobs.js";
 import { runJobSpy } from "./src/run";
 
 type JobSpySite = NonNullable<Parameters<typeof runJobSpy>[0]["sites"]>[number];
@@ -20,6 +21,8 @@ export const manifest: ExtractorManifest = {
     if (context.shouldCancel?.()) {
       return { success: true, jobs: [] };
     }
+
+    const existingJobUrls = await context.getExistingJobUrls?.();
 
     const sites = context.selectedSources.filter(isJobSpySite);
 
@@ -67,9 +70,10 @@ export const manifest: ExtractorManifest = {
       };
     }
 
+    const { jobs } = filterExistingJobs(result.jobs, existingJobUrls, "JobSpy");
     return {
       success: true,
-      jobs: result.jobs,
+      jobs,
     };
   },
 };

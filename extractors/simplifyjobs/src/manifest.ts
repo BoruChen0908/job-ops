@@ -2,6 +2,7 @@ import type {
   ExtractorManifest,
   ExtractorProgressEvent,
 } from "@shared/types/extractors";
+import { filterExistingJobs } from "@shared/utils/filter-existing-jobs.js";
 import {
   runSimplifyJobs,
   type SimplifyJobsProgressEvent,
@@ -38,6 +39,8 @@ export const manifest: ExtractorManifest = {
       return { success: true, jobs: [] };
     }
 
+    const existingJobUrls = await context.getExistingJobUrls?.();
+
     const parsedMax = context.settings.jobspyResultsWanted
       ? Number.parseInt(context.settings.jobspyResultsWanted, 10)
       : Number.NaN;
@@ -58,7 +61,8 @@ export const manifest: ExtractorManifest = {
       return { success: false, jobs: [], error: result.error };
     }
 
-    return { success: true, jobs: result.jobs };
+    const { jobs } = filterExistingJobs(result.jobs, existingJobUrls, "Simplify Jobs");
+    return { success: true, jobs };
   },
 };
 

@@ -3,6 +3,7 @@ import type {
   ExtractorProgressEvent,
   ExtractorRuntimeContext,
 } from "@shared/types/extractors";
+import { filterExistingJobs } from "@shared/utils/filter-existing-jobs.js";
 import { runUkVisaJobs } from "./src/run";
 
 function toProgress(event: {
@@ -72,6 +73,8 @@ export const manifest: ExtractorManifest = {
       return { success: true, jobs: [] };
     }
 
+    const existingJobUrls = await context.getExistingJobUrls?.();
+
     const maxJobs = context.settings.ukvisajobsMaxJobs
       ? parseInt(context.settings.ukvisajobsMaxJobs, 10)
       : 50;
@@ -94,9 +97,10 @@ export const manifest: ExtractorManifest = {
       };
     }
 
+    const { jobs } = filterExistingJobs(result.jobs, existingJobUrls, "UK Visa Jobs");
     return {
       success: true,
-      jobs: result.jobs,
+      jobs,
     };
   },
 };

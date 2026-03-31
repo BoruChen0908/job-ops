@@ -4,6 +4,7 @@ import type {
   ExtractorManifest,
   ExtractorProgressEvent,
 } from "@shared/types/extractors";
+import { filterExistingJobs } from "@shared/utils/filter-existing-jobs.js";
 import { runAdzuna } from "./src/run";
 
 function toProgress(event: {
@@ -58,6 +59,8 @@ export const manifest: ExtractorManifest = {
       return { success: true, jobs: [] };
     }
 
+    const existingJobUrls = await context.getExistingJobUrls?.();
+
     const countryCode = getAdzunaCountryCode(context.selectedCountry);
     if (!countryCode) {
       return {
@@ -110,9 +113,10 @@ export const manifest: ExtractorManifest = {
       };
     }
 
+    const { jobs } = filterExistingJobs(result.jobs, existingJobUrls, "Adzuna");
     return {
       success: true,
-      jobs: result.jobs,
+      jobs,
     };
   },
 };

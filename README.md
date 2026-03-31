@@ -1,23 +1,46 @@
-# JobOps: Your Ironman Suit for Job Hunting
+# JobOps Fork (BoruChen0908)
 
+> Forked from [DaKheera47/job-ops](https://github.com/DaKheera47/job-ops) — a self-hosted, Docker-based job search pipeline.
 
-<a href="https://trendshift.io/repositories/22756" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22756" alt="DaKheera47%2Fjob-ops | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+This fork extends job-ops with features for US internship hunting: a new job source, LLM-powered search term discovery, extractor-level dedup, and multi-user Docker support.
 
-[![Stars](https://img.shields.io/github/stars/DaKheera47/job-ops?style=social)](https://github.com/DaKheera47/job-ops)
-[![GHCR](https://img.shields.io/badge/docker-ghcr.io-blue?logo=docker&logoColor=white)](https://github.com/DaKheera47/job-ops/pkgs/container/job-ops)
-[![Release](https://github.com/DaKheera47/job-ops/actions/workflows/ghcr.yml/badge.svg)](https://github.com/DaKheera47/job-ops/actions/workflows/ghcr.yml)
-[![Contributors](https://img.shields.io/github/contributors-anon/dakheera47/job-ops)](Contributors)
-[![Cloud Waitlist](https://img.shields.io/badge/Cloud-Join_Waitlist-orange?style=flat-square)](https://try.jobops.app?utm_source=github&utm_medium=badge&utm_campaign=waitlist)
+## Fork Features
 
-<img width="1200" height="600" alt="2k" src="https://github.com/user-attachments/assets/14fdc392-0e96-43be-bc1f-cf819ab2afc4" />
+| Feature | Description |
+|---------|-------------|
+| **SimplifyJobs Extractor** | Fetches intern/new-grad listings from SimplifyJobs GitHub repos (Summer2026-Internships + New-Grad-Positions) |
+| **Dynamic Term Expansion** | After scoring, LLM analyzes top JDs to discover new search terms. Shown as accept/dismiss chips in the Run Pipeline dialog. Accepted terms auto-merge into next run's search queries. |
+| **Extractor-Level Dedup** | All extractors skip already-known job URLs before returning results, so per-term budget is spent on genuinely new listings |
+| **Multi-User Instances** | Separate Docker Compose files with bind-mount data isolation per user (e.g. `docker-compose.katherine.yml`) |
 
-Stop applying blind.
+## Quick Start
 
-Scrapes major job boards (LinkedIn, Indeed, Glassdoor & more), AI-scores suitability, tailors resumes (RxResume), and tracks application emails automatically.
+```bash
+git clone https://github.com/BoruChen0908/job-ops.git
+cd job-ops
+cp .env.example .env   # Edit with your LLM API key and RxResume credentials
+docker compose up -d
+# Open http://localhost:3005
+```
 
-You still apply to every job yourself. JobOps just finds jobs, makes sure you're applying to the right ones with a tailored CV, and not losing track of where you're at.
+### Running a second instance (for another user)
 
-Self-hosted. Docker-based.
+```bash
+docker compose -f docker-compose.katherine.yml up -d
+# Open http://localhost:3006
+```
+
+Each instance has its own SQLite database, settings, and pipeline state.
+
+## Pipeline Flow
+
+```
+discover (extractors) -> import (SQLite) -> score (LLM) -> extract terms (LLM) -> select (topN) -> tailor (LLM) -> PDF (RxResume)
+```
+
+## Upstream Features
+
+Everything from the original job-ops still works:
 
 ## 40s Demo: Crawl -> Score -> PDF -> Track
 
@@ -97,6 +120,7 @@ docker compose up -d
 | **Working Nomads** | Remote-only curated jobs |
 | **Gradcracker** | STEM / Grads (UK) |
 | **UK Visa Jobs** | Sponsorship (UK) |
+| **SimplifyJobs** | US Internships / New Grad (fork) |
 
 *(More extractors can be added via TypeScript - see [extractors documentation](https://jobops.dakheera47.com/docs/extractors/overview))*
 
@@ -129,18 +153,13 @@ Support me on [kofi](https://ko-fi.com/shaheersarfaraz)
 Want to contribute code, docs, or extractors? Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 
-## Star History
+## Syncing with Upstream
 
-<a href="https://www.star-history.com/#DaKheera47/job-ops&type=date&legend=top-left">
-<picture>
-<source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=DaKheera47/job-ops&type=date&theme=dark&legend=top-left" />
-<source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=DaKheera47/job-ops&type=date&legend=top-left" />
-<img alt="Star History Chart" src="https://api.star-history.com/svg?repos=DaKheera47/job-ops&type=date&legend=top-left" />
-</picture>
-</a>
+```bash
+git fetch upstream
+git merge upstream/main
+```
 
 ## License
 
-**AGPLv3 + Commons Clause** - You can self-host, use, and modify JobOps, but
-you cannot sell the software itself or offer paid hosted/support services whose
-value substantially comes from JobOps. See [LICENSE](LICENSE).
+**AGPLv3 + Commons Clause** - inherited from upstream. See [LICENSE](LICENSE).

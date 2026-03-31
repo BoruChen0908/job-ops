@@ -58,6 +58,9 @@ Also add source ID to `orchestrator/src/client/pages/orchestrator/utils.ts` (`ge
 docker compose up -d
 # App at http://localhost:3005
 
+# Katherine's instance (port 3006)
+docker compose -f docker-compose.katherine.yml up -d
+
 # Dev mode (without Docker)
 cd orchestrator && npm run dev
 ```
@@ -101,11 +104,14 @@ If better-sqlite3 ABI mismatch: `npm --workspace orchestrator rebuild better-sql
 
 ### Done
 1. **SimplifyJobs extractor** — fetches intern/new-grad listings from SimplifyJobs GitHub JSON repos (Summer2026-Internships + New-Grad-Positions). Filters by active/visible status and search terms.
-2. **Dynamic term expansion** — after scoring, LLM analyzes top JDs to discover new search terms. Stored in `recommended_terms` table, shown as accept/dismiss chips in Run Pipeline dialog. Accepted terms auto-merge into next pipeline run's search terms.
+2. **Dynamic term expansion** — after scoring, LLM analyzes top JDs to discover new search terms. Stored in `recommended_terms` table, shown as accept/dismiss chips in Run Pipeline dialog. Accepted terms auto-merge into next pipeline run's search terms and appear in the search terms list immediately on accept.
+3. **Extractor-level dedup** — all extractors now call `getExistingJobUrls()` and filter out already-known job URLs before returning results. Ensures per-term budget is spent on new listings, not re-discovering duplicates. Shared utility: `shared/src/utils/filter-existing-jobs.ts`.
+4. **Multi-user support** — separate Docker instances via `docker-compose.katherine.yml` with bind-mount data isolation (`./data-katherine`). Each user gets their own DB, settings, and pipeline state.
 
 ### Planned
 1. **More extractors:** SpeedyApply AI-College-Jobs, AI Safety job boards (aisafety.com/jobs, 80000hours.org)
 2. **Scorer prompt tuning:** AI Safety keyword weighting in suitability scoring
+3. **Deeper extractor dedup:** pass existing URLs into subprocess extractors (JobSpy, HiringCafe) so they skip known URLs during crawling, not just after
 
 ## Git workflow
 
@@ -128,4 +134,7 @@ If better-sqlite3 ABI mismatch: `npm --workspace orchestrator rebuild better-sql
 | Configure LLM providers | `orchestrator/src/server/services/llm/providers/` |
 | Change term expansion | `orchestrator/src/server/services/term-expansion.ts` + `pipeline/steps/extract-terms.ts` |
 | Manage recommended terms | `orchestrator/src/server/repositories/recommended-terms.ts` + `api/routes/recommended-terms.ts` |
+| Change extractor dedup | `shared/src/utils/filter-existing-jobs.ts` (utility) + each `extractors/*/manifest.ts` |
+| Add another user instance | Copy `docker-compose.katherine.yml`, change container name, port, and data dir |
+| Register a new prompt template | `shared/src/prompt-template-definitions.ts` AND `shared/src/settings-registry.ts` (both required) |
 | Understand shared types | `shared/src/types/` (extractors, jobs, settings) |

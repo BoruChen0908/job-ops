@@ -96,6 +96,20 @@ export interface SalaryFilter {
   max: number | null;
 }
 
+export const DATE_POSTED_FILTER_OPTIONS: ReadonlyArray<{
+  value: number;
+  label: string;
+}> = [
+  { value: 0, label: "Any time" },
+  { value: 1, label: "Past 24 hours" },
+  { value: 3, label: "Past 3 days" },
+  { value: 7, label: "Past week" },
+  { value: 14, label: "Past 2 weeks" },
+  { value: 30, label: "Past month" },
+  { value: 90, label: "Past 3 months" },
+  { value: -1, label: "No date" },
+];
+
 export interface JobSort {
   key: SortKey;
   direction: SortDirection;

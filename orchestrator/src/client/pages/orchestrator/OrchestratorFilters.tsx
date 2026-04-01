@@ -33,7 +33,12 @@ import type {
   SalaryFilterMode,
   SponsorFilter,
 } from "./constants";
-import { defaultSortDirection, orderedFilterSources, tabs } from "./constants";
+import {
+  DATE_POSTED_FILTER_OPTIONS,
+  defaultSortDirection,
+  orderedFilterSources,
+  tabs,
+} from "./constants";
 
 interface OrchestratorFiltersProps {
   activeTab: FilterTab;
@@ -46,6 +51,8 @@ interface OrchestratorFiltersProps {
   onSponsorFilterChange: (value: SponsorFilter) => void;
   salaryFilter: SalaryFilter;
   onSalaryFilterChange: (value: SalaryFilter) => void;
+  datePostedDays: number;
+  onDatePostedDaysChange: (value: number) => void;
   sourcesWithJobs: JobSource[];
   sort: JobSort;
   onSortChange: (sort: JobSort) => void;
@@ -123,6 +130,8 @@ export const OrchestratorFilters: React.FC<OrchestratorFiltersProps> = ({
   onSponsorFilterChange,
   salaryFilter,
   onSalaryFilterChange,
+  datePostedDays,
+  onDatePostedDaysChange,
   sourcesWithJobs,
   sort,
   onSortChange,
@@ -146,8 +155,9 @@ export const OrchestratorFilters: React.FC<OrchestratorFiltersProps> = ({
       Number(
         (typeof salaryFilter.min === "number" && salaryFilter.min > 0) ||
           (typeof salaryFilter.max === "number" && salaryFilter.max > 0),
-      ),
-    [sourceFilter, sponsorFilter, salaryFilter.min, salaryFilter.max],
+      ) +
+      Number(datePostedDays !== 0),
+    [sourceFilter, sponsorFilter, salaryFilter.min, salaryFilter.max, datePostedDays],
   );
   const showSalaryMin =
     salaryFilter.mode === "at_least" || salaryFilter.mode === "between";
@@ -224,7 +234,7 @@ export const OrchestratorFilters: React.FC<OrchestratorFiltersProps> = ({
                     )}
                   </SheetTitle>
                   <SheetDescription>
-                    Refine sources, sponsor status, salary, and sorting.
+                    Refine sources, sponsor status, date posted, salary, and sorting.
                   </SheetDescription>
                 </SheetHeader>
 
@@ -276,6 +286,29 @@ export const OrchestratorFilters: React.FC<OrchestratorFiltersProps> = ({
                               : "outline"
                           }
                           onClick={() => onSponsorFilterChange(option.value)}
+                        >
+                          {option.label}
+                        </Button>
+                      ))}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle>Date posted</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-wrap gap-2">
+                      {DATE_POSTED_FILTER_OPTIONS.map((option) => (
+                        <Button
+                          key={option.value}
+                          type="button"
+                          size="sm"
+                          variant={
+                            datePostedDays === option.value
+                              ? "default"
+                              : "outline"
+                          }
+                          onClick={() => onDatePostedDaysChange(option.value)}
                         >
                           {option.label}
                         </Button>

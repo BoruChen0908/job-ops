@@ -21,6 +21,7 @@ export const useFilteredJobs = (
   sourceFilter: JobSource | "all",
   sponsorFilter: SponsorFilter,
   salaryFilter: SalaryFilter,
+  datePostedDays: number,
   sort: JobSort,
 ) =>
   useMemo(() => {
@@ -92,5 +93,21 @@ export const useFilteredJobs = (
       });
     }
 
+    if (datePostedDays === -1) {
+      filtered = filtered.filter((job) => !job.datePosted);
+    } else if (datePostedDays > 0) {
+      const cutoff = new Date();
+      cutoff.setUTCDate(cutoff.getUTCDate() - datePostedDays);
+      cutoff.setUTCHours(0, 0, 0, 0);
+      const cutoffMs = cutoff.getTime();
+
+      filtered = filtered.filter((job) => {
+        if (!job.datePosted) return false;
+        const ms = new Date(job.datePosted).getTime();
+        if (Number.isNaN(ms)) return false;
+        return ms >= cutoffMs;
+      });
+    }
+
     return [...filtered].sort((a, b) => compareJobs(a, b, sort));
-  }, [jobs, activeTab, sourceFilter, sponsorFilter, salaryFilter, sort]);
+  }, [jobs, activeTab, sourceFilter, sponsorFilter, salaryFilter, datePostedDays, sort]);

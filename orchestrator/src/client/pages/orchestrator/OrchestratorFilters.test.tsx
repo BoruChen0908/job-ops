@@ -44,6 +44,8 @@ const renderFilters = (
       max: null,
     },
     onSalaryFilterChange: vi.fn(),
+    datePostedDays: 0,
+    onDatePostedDaysChange: vi.fn(),
     sourcesWithJobs: ["gradcracker", "linkedin", "manual"] as JobSource[],
     sort: { key: "score", direction: "desc" } as JobSort,
     onSortChange: vi.fn(),

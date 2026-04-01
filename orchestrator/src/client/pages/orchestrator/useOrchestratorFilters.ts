@@ -21,6 +21,8 @@ const allowedSalaryModes: SalaryFilterMode[] = [
   "at_most",
   "between",
 ];
+const allowedDatePostedDays = new Set([0, 1, 3, 7, 14, 30, 90, -1]);
+
 const allowedSortKeys: JobSort["key"][] = [
   "discoveredAt",
   "score",
@@ -121,6 +123,27 @@ export const useOrchestratorFilters = () => {
     [setSearchParams],
   );
 
+  const datePostedDays = useMemo((): number => {
+    const raw = searchParams.get("datePosted");
+    if (raw == null) return 0;
+    const parsed = Number.parseInt(raw, 10);
+    return allowedDatePostedDays.has(parsed) ? parsed : 0;
+  }, [searchParams]);
+
+  const setDatePostedDays = useCallback(
+    (value: number) => {
+      setSearchParams(
+        (prev) => {
+          if (value === 0) prev.delete("datePosted");
+          else prev.set("datePosted", String(value));
+          return prev;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
   const sort = useMemo((): JobSort => {
     const sortValue = searchParams.get("sort");
     if (!sortValue) return DEFAULT_SORT;
@@ -168,6 +191,7 @@ export const useOrchestratorFilters = () => {
         prev.delete("salaryMin");
         prev.delete("salaryMax");
         prev.delete("minSalary");
+        prev.delete("datePosted");
         prev.delete("sort");
         return prev;
       },
@@ -183,6 +207,8 @@ export const useOrchestratorFilters = () => {
     setSponsorFilter,
     salaryFilter,
     setSalaryFilter,
+    datePostedDays,
+    setDatePostedDays,
     sort,
     setSort,
     resetFilters,

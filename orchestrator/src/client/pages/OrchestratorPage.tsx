@@ -41,6 +41,8 @@ export const OrchestratorPage: React.FC = () => {
     setSponsorFilter,
     salaryFilter,
     setSalaryFilter,
+    datePostedDays,
+    setDatePostedDays,
     sort,
     setSort,
     resetFilters,
@@ -145,6 +147,7 @@ export const OrchestratorPage: React.FC = () => {
     sourceFilter,
     sponsorFilter,
     salaryFilter,
+    datePostedDays,
     sort,
   );
   const setActiveTab = useCallback(
@@ -388,6 +391,8 @@ export const OrchestratorPage: React.FC = () => {
             onSponsorFilterChange={setSponsorFilter}
             salaryFilter={salaryFilter}
             onSalaryFilterChange={setSalaryFilter}
+            datePostedDays={datePostedDays}
+            onDatePostedDaysChange={setDatePostedDays}
             sourcesWithJobs={sourcesWithJobs}
             sort={sort}
             onSortChange={setSort}
@@ -405,6 +410,7 @@ export const OrchestratorPage: React.FC = () => {
               selectedJobId={selectedJobId}
               selectedJobIds={selectedJobIds}
               activeTab={activeTab}
+              showDates={settings?.showJobDates?.value ?? false}
               onSelectJob={handleSelectJob}
               onToggleSelectJob={toggleSelectJob}
               onToggleSelectAll={toggleSelectAll}

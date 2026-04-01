@@ -89,6 +89,7 @@ const DEFAULT_FORM_VALUES: UpdateSettingsInput = {
   rxresumeBaseResumeId: null,
   showSponsorInfo: null,
   renderMarkdownInJobDescriptions: null,
+  showJobDates: null,
   chatStyleTone: "",
   chatStyleFormality: "",
   chatStyleConstraints: "",
@@ -169,6 +170,7 @@ const NULL_SETTINGS_PAYLOAD: UpdateSettingsInput = {
   rxresumeBaseResumeId: null,
   showSponsorInfo: null,
   renderMarkdownInJobDescriptions: null,
+  showJobDates: null,
   chatStyleTone: null,
   chatStyleFormality: null,
   chatStyleConstraints: null,
@@ -217,6 +219,7 @@ const mapSettingsToForm = (data: AppSettings): UpdateSettingsInput => ({
   showSponsorInfo: data.showSponsorInfo.override,
   renderMarkdownInJobDescriptions:
     data.renderMarkdownInJobDescriptions.override,
+  showJobDates: data.showJobDates.override,
   chatStyleTone: data.chatStyleTone.override ?? "",
   chatStyleFormality: data.chatStyleFormality.override ?? "",
   chatStyleConstraints: data.chatStyleConstraints.override ?? "",
@@ -332,6 +335,10 @@ const getDerivedSettings = (settings: AppSettings | null) => {
       renderMarkdownInJobDescriptions: {
         effective: settings?.renderMarkdownInJobDescriptions?.value ?? true,
         default: settings?.renderMarkdownInJobDescriptions?.default ?? true,
+      },
+      showJobDates: {
+        effective: settings?.showJobDates?.value ?? false,
+        default: settings?.showJobDates?.default ?? false,
       },
     },
     chat: {
@@ -914,6 +921,10 @@ export const SettingsPage: React.FC = () => {
         renderMarkdownInJobDescriptions: nullIfSame(
           data.renderMarkdownInJobDescriptions,
           display.renderMarkdownInJobDescriptions.default,
+        ),
+        showJobDates: nullIfSame(
+          data.showJobDates,
+          display.showJobDates.default,
         ),
         chatStyleTone: normalizeString(data.chatStyleTone),
         chatStyleFormality: normalizeString(data.chatStyleFormality),

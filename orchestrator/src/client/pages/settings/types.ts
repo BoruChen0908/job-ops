@@ -21,6 +21,7 @@ export type WebhookValues = EffectiveDefault<string>;
 export type DisplayValues = {
   showSponsorInfo: EffectiveDefault<boolean>;
   renderMarkdownInJobDescriptions: EffectiveDefault<boolean>;
+  showJobDates: EffectiveDefault<boolean>;
 };
 export type ChatValues = {
   tone: EffectiveDefault<string>;

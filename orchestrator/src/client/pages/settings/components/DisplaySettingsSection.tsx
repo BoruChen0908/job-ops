@@ -21,7 +21,8 @@ export const DisplaySettingsSection: React.FC<DisplaySettingsSectionProps> = ({
   isLoading,
   isSaving,
 }) => {
-  const { showSponsorInfo, renderMarkdownInJobDescriptions } = values;
+  const { showSponsorInfo, renderMarkdownInJobDescriptions, showJobDates } =
+    values;
   const { control } = useFormContext<UpdateSettingsInput>();
 
   return (
@@ -104,6 +105,37 @@ export const DisplaySettingsSection: React.FC<DisplaySettingsSectionProps> = ({
           </div>
 
           <Separator />
+
+          <div className="flex items-start space-x-3">
+            <Controller
+              name="showJobDates"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  id="showJobDates"
+                  checked={field.value ?? showJobDates.default}
+                  onCheckedChange={(checked) => {
+                    field.onChange(
+                      checked === "indeterminate" ? null : checked === true,
+                    );
+                  }}
+                  disabled={isLoading || isSaving}
+                />
+              )}
+            />
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="showJobDates"
+                className="text-sm font-medium leading-none cursor-pointer"
+              >
+                Show dates in job list
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Display the posting date and deadline below each job in the list
+                panel.
+              </p>
+            </div>
+          </div>
         </div>
       </AccordionContent>
     </AccordionItem>

@@ -14,6 +14,7 @@ interface JobListPanelProps {
   selectedJobId: string | null;
   selectedJobIds: Set<string>;
   activeTab: FilterTab;
+  showDates?: boolean;
   onSelectJob: (jobId: string) => void;
   onToggleSelectJob: (jobId: string) => void;
   onToggleSelectAll: (checked: boolean) => void;
@@ -26,6 +27,7 @@ export const JobListPanel: React.FC<JobListPanelProps> = ({
   selectedJobId,
   selectedJobIds,
   activeTab,
+  showDates = false,
   onSelectJob,
   onToggleSelectJob,
   onToggleSelectAll,
@@ -126,6 +128,7 @@ export const JobListPanel: React.FC<JobListPanelProps> = ({
                   job={job}
                   isSelected={isSelected}
                   showStatusDot={false}
+                  showDates={showDates}
                 />
               </button>
             </div>

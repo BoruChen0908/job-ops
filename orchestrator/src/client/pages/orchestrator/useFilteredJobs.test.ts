@@ -34,6 +34,7 @@ describe("useFilteredJobs", () => {
         "all",
         "all",
         { mode: "at_least", min: null, max: null },
+        0,
         {
           key: "score",
           direction: "desc",
@@ -61,6 +62,7 @@ describe("useFilteredJobs", () => {
         "all",
         "all",
         { mode: "at_least", min: null, max: null },
+        0,
         {
           key: "score",
           direction: "desc",
@@ -89,6 +91,7 @@ describe("useFilteredJobs", () => {
         "all",
         "confirmed",
         { mode: "at_least", min: null, max: null },
+        0,
         {
           key: "score",
           direction: "desc",
@@ -114,6 +117,7 @@ describe("useFilteredJobs", () => {
         "all",
         "all",
         { mode: "between", min: 60000, max: 80000 },
+        0,
         {
           key: "score",
           direction: "desc",
@@ -142,6 +146,7 @@ describe("useFilteredJobs", () => {
         "all",
         "all",
         { mode: "at_least", min: null, max: null },
+        0,
         {
           key: "salary",
           direction: "desc",

@@ -2,10 +2,18 @@ import type { JobListItem } from "@shared/types.js";
 import { cn } from "@/lib/utils";
 import { defaultStatusToken, statusTokens } from "./constants";
 
+function formatShortDate(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 interface JobRowContentProps {
   job: JobListItem;
   isSelected?: boolean;
   showStatusDot?: boolean;
+  showDates?: boolean;
   statusDotClassName?: string;
   className?: string;
 }
@@ -20,6 +28,7 @@ export const JobRowContent = ({
   job,
   isSelected = false,
   showStatusDot = true,
+  showDates = false,
   statusDotClassName,
   className,
 }: JobRowContentProps) => {
@@ -58,6 +67,14 @@ export const JobRowContent = ({
         {job.salary?.trim() && (
           <div className="truncate text-xs text-muted-foreground mt-0.5">
             {job.salary}
+          </div>
+        )}
+        {showDates && (
+          <div className="truncate text-xs text-muted-foreground/70 mt-0.5">
+            {formatShortDate(job.datePosted)
+              ? `Posted ${formatShortDate(job.datePosted)}`
+              : "No post date"}
+            {job.deadline && ` · Due ${formatShortDate(job.deadline) ?? job.deadline}`}
           </div>
         )}
       </div>

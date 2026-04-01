@@ -1,6 +1,11 @@
 import { ReactiveResumeConfigPanel } from "@client/components/ReactiveResumeConfigPanel";
+import { SettingsSectionFrame } from "@client/pages/settings/components/SettingsSectionFrame";
 import type { UpdateSettingsInput } from "@shared/settings-schema.js";
-import type { ResumeProjectCatalogItem, RxResumeMode } from "@shared/types.js";
+import type {
+  PdfRenderer,
+  ResumeProjectCatalogItem,
+  RxResumeMode,
+} from "@shared/types.js";
 import type React from "react";
 import {
   type Path,
@@ -8,11 +13,6 @@ import {
   useFormContext,
   useWatch,
 } from "react-hook-form";
-import {
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 type ReactiveResumeSectionProps = {
   rxResumeBaseResumeIdDraft: string | null;
@@ -42,6 +42,7 @@ type ReactiveResumeSectionProps = {
   isProjectsLoading: boolean;
   isLoading: boolean;
   isSaving: boolean;
+  layoutMode?: "accordion" | "panel";
 };
 
 export const ReactiveResumeSection: React.FC<ReactiveResumeSectionProps> = ({
@@ -58,6 +59,7 @@ export const ReactiveResumeSection: React.FC<ReactiveResumeSectionProps> = ({
   isProjectsLoading,
   isLoading,
   isSaving,
+  layoutMode,
 }) => {
   const {
     control,
@@ -67,6 +69,10 @@ export const ReactiveResumeSection: React.FC<ReactiveResumeSectionProps> = ({
   } = useFormContext<UpdateSettingsInput>();
   const selectedMode =
     useWatch({ control, name: "rxresumeMode" }) ?? rxresumeMode ?? "v5";
+  const pdfRendererValue = (useWatch({
+    control,
+    name: "pdfRenderer",
+  }) ?? "rxresume") as PdfRenderer;
   const rxresumeApiKeyValue =
     useWatch({ control, name: "rxresumeApiKey" }) ?? "";
   const rxresumeEmailValue = useWatch({ control, name: "rxresumeEmail" }) ?? "";
@@ -93,72 +99,70 @@ export const ReactiveResumeSection: React.FC<ReactiveResumeSectionProps> = ({
   };
 
   return (
-    <AccordionItem
-      id="settings-section-reactive-resume"
+    <SettingsSectionFrame
+      mode={layoutMode}
+      title="Reactive Resume"
       value="reactive-resume"
-      className="rounded-xl border border-border/80 bg-card/80 px-4 shadow-sm"
     >
-      <AccordionTrigger className="hover:no-underline py-4">
-        <span className="text-base font-semibold">Reactive Resume</span>
-      </AccordionTrigger>
-      <AccordionContent className="pb-4">
-        <ReactiveResumeConfigPanel
-          mode={selectedMode}
-          onModeChange={(mode) => {
-            onRxresumeModeChange?.(mode);
-            setDirtyTouchedValue("rxresumeMode", mode);
-          }}
-          disabled={isLoading || isSaving}
-          hasRxResumeAccess={hasRxResumeAccess}
-          showValidationStatus={Boolean(validationStatuses)}
-          validationStatuses={validationStatuses}
-          shared={{
-            baseUrl: rxresumeUrlValue,
-            onBaseUrlChange: (value) => {
-              clearRxResumeFeedback(selectedMode);
-              setDirtyTouchedValue("rxresumeUrl", value);
-            },
-            baseUrlError: errors.rxresumeUrl?.message as string | undefined,
-          }}
-          v5={{
-            apiKey: rxresumeApiKeyValue,
-            onApiKeyChange: (value) => {
-              clearRxResumeFeedback("v5");
-              setDirtyTouchedValue("rxresumeApiKey", value);
-            },
-            error: errors.rxresumeApiKey?.message as string | undefined,
-          }}
-          v4={{
-            email: rxresumeEmailValue,
-            onEmailChange: (value) => {
-              clearRxResumeFeedback("v4");
-              setDirtyTouchedValue("rxresumeEmail", value);
-            },
-            emailError: errors.rxresumeEmail?.message as string | undefined,
-            password: rxresumePasswordValue,
-            onPasswordChange: (value) => {
-              clearRxResumeFeedback("v4");
-              setDirtyTouchedValue("rxresumePassword", value);
-            },
-            passwordError: errors.rxresumePassword?.message as
-              | string
-              | undefined,
-          }}
-          projectSelection={{
-            baseResumeId: rxResumeBaseResumeIdDraft,
-            onBaseResumeIdChange: setRxResumeBaseResumeIdDraft,
-            projects: profileProjects,
-            value: resumeProjectsValue,
-            onChange: (next) => setDirtyTouchedValue("resumeProjects", next),
-            lockedCount,
-            maxProjectsTotal,
-            isProjectsLoading,
-            disabled: isLoading || isSaving,
-            maxProjectsError:
-              errors.resumeProjects?.maxProjects?.message?.toString(),
-          }}
-        />
-      </AccordionContent>
-    </AccordionItem>
+      <ReactiveResumeConfigPanel
+        mode={selectedMode}
+        onModeChange={(mode) => {
+          onRxresumeModeChange?.(mode);
+          setDirtyTouchedValue("rxresumeMode", mode);
+        }}
+        pdfRenderer={pdfRendererValue}
+        onPdfRendererChange={(value) =>
+          setDirtyTouchedValue("pdfRenderer", value)
+        }
+        pdfRendererError={errors.pdfRenderer?.message as string | undefined}
+        disabled={isLoading || isSaving}
+        hasRxResumeAccess={hasRxResumeAccess}
+        showValidationStatus={Boolean(validationStatuses)}
+        validationStatuses={validationStatuses}
+        shared={{
+          baseUrl: rxresumeUrlValue,
+          onBaseUrlChange: (value) => {
+            clearRxResumeFeedback(selectedMode);
+            setDirtyTouchedValue("rxresumeUrl", value);
+          },
+          baseUrlError: errors.rxresumeUrl?.message as string | undefined,
+        }}
+        v5={{
+          apiKey: rxresumeApiKeyValue,
+          onApiKeyChange: (value) => {
+            clearRxResumeFeedback("v5");
+            setDirtyTouchedValue("rxresumeApiKey", value);
+          },
+          error: errors.rxresumeApiKey?.message as string | undefined,
+        }}
+        v4={{
+          email: rxresumeEmailValue,
+          onEmailChange: (value) => {
+            clearRxResumeFeedback("v4");
+            setDirtyTouchedValue("rxresumeEmail", value);
+          },
+          emailError: errors.rxresumeEmail?.message as string | undefined,
+          password: rxresumePasswordValue,
+          onPasswordChange: (value) => {
+            clearRxResumeFeedback("v4");
+            setDirtyTouchedValue("rxresumePassword", value);
+          },
+          passwordError: errors.rxresumePassword?.message as string | undefined,
+        }}
+        projectSelection={{
+          baseResumeId: rxResumeBaseResumeIdDraft,
+          onBaseResumeIdChange: setRxResumeBaseResumeIdDraft,
+          projects: profileProjects,
+          value: resumeProjectsValue,
+          onChange: (next) => setDirtyTouchedValue("resumeProjects", next),
+          lockedCount,
+          maxProjectsTotal,
+          isProjectsLoading,
+          disabled: isLoading || isSaving,
+          maxProjectsError:
+            errors.resumeProjects?.maxProjects?.message?.toString(),
+        }}
+      />
+    </SettingsSectionFrame>
   );
 };

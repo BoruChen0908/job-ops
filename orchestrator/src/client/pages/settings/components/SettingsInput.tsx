@@ -10,6 +10,7 @@ type SettingsInputProps = {
   disabled?: boolean;
   error?: string;
   helper?: string;
+  current?: string;
 };
 
 export const SettingsInput: React.FC<SettingsInputProps> = ({
@@ -20,6 +21,7 @@ export const SettingsInput: React.FC<SettingsInputProps> = ({
   disabled,
   error,
   helper,
+  current,
 }) => {
   const id = inputProps.id || inputProps.name;
 
@@ -38,6 +40,9 @@ export const SettingsInput: React.FC<SettingsInputProps> = ({
         disabled={disabled}
       />
       {error && <p className="text-xs text-destructive">{error}</p>}
+      {current && (
+        <div className="text-xs text-muted-foreground">{current}</div>
+      )}
       {helper && <div className="text-xs text-muted-foreground">{helper}</div>}
     </div>
   );

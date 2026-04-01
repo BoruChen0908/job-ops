@@ -25,6 +25,7 @@ const WebhooksHarness = () => {
             default: "https://default-j.com",
             effective: "https://job.com",
           }}
+          webhookSecretHint={null}
           isLoading={false}
           isSaving={false}
         />

@@ -5,6 +5,8 @@ import {
   CHAT_STYLE_MANUAL_LANGUAGE_VALUES,
   type ChatStyleLanguageMode,
   type ChatStyleManualLanguage,
+  PDF_RENDERER_VALUES,
+  type PdfRenderer,
   type ResumeProjectsSettings,
 } from "./types/settings";
 
@@ -127,6 +129,7 @@ const parseChatStyleLanguageModeOrNull = createEnumParser(
 const parseChatStyleManualLanguageOrNull = createEnumParser(
   CHAT_STYLE_MANUAL_LANGUAGE_VALUES,
 );
+const parsePdfRendererOrNull = createEnumParser(PDF_RENDERER_VALUES);
 
 const WORKPLACE_TYPE_VALUES = ["remote", "hybrid", "onsite"] as const;
 const parseWorkplaceTypesOrNull = createEnumArrayParser(WORKPLACE_TYPE_VALUES);
@@ -248,6 +251,14 @@ export const settingsRegistry = {
       return raw === "v4" || raw === "v5" ? raw : null;
     },
     serialize: (value: "v4" | "v5" | null | undefined): string | null =>
+      value ?? null,
+  },
+  pdfRenderer: {
+    kind: "typed" as const,
+    schema: z.enum(PDF_RENDERER_VALUES),
+    default: (): PdfRenderer => "rxresume",
+    parse: parsePdfRendererOrNull,
+    serialize: (value: PdfRenderer | null | undefined): string | null =>
       value ?? null,
   },
   ukvisajobsMaxJobs: {
@@ -470,6 +481,20 @@ export const settingsRegistry = {
     parse: parseNonEmptyStringOrNull,
     serialize: (value: string | null | undefined): string | null =>
       value ?? null,
+  },
+  chatStyleSummaryMaxWords: {
+    kind: "typed" as const,
+    schema: z.number().int().min(1).max(500).nullable(),
+    default: (): number | null => null,
+    parse: parseIntOrNull,
+    serialize: serializeNullableNumber,
+  },
+  chatStyleMaxKeywordsPerSkill: {
+    kind: "typed" as const,
+    schema: z.number().int().min(1).max(50).nullable(),
+    default: (): number | null => null,
+    parse: parseIntOrNull,
+    serialize: serializeNullableNumber,
   },
   chatStyleLanguageMode: {
     kind: "typed" as const,

@@ -94,6 +94,9 @@ Settings gives you runtime overrides for the key parts of discovery, scoring, ta
   - `Match Resume`: detect the dominant language from your resume/profile content and use that language for generated output
 - If language detection is unclear or there is not enough resume/profile text, JobOps falls back to English
 - Resume tailoring keeps the exact source wording for ATS-sensitive resume headlines and job titles, even when the rest of the tailored content is generated in the selected language
+- Summary max words: optional cap on AI-generated summary length (empty = no limit)
+- Max keywords per skill: optional cap on keywords per skill category in tailoring (empty = no limit)
+- These numeric limits override any similar constraints written in the Constraints text field
 - Do-not-use terms are model guidance, not a guaranteed output filter
 
 #### Writing Style & Language workflow
@@ -139,6 +142,10 @@ Defaults and constraints:
 
 - Configure a shared RxResume URL for cloud or self-hosted deployments
 - Configure v4 email/password or v5 API key in the same section
+- Choose the PDF renderer:
+  - RxResume export
+  - Local LaTeX renderer
+- JobOps uses the selected RxResume resume as the source of truth in both modes
 - Invalid Reactive Resume credentials or other `4xx` config failures block the save and stay visible as an inline error
 - Temporary Reactive Resume downtime shows an inline warning, but the save still succeeds
 - Select a template/base resume

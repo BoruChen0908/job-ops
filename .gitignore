@@ -19,3 +19,8 @@ extractors/ukvisajobs/storage/
 # OS files
 .DS_Store
 Thumbs.db
+.gstack/
+
+# Claude Code local preferences
+CLAUDE.local.md
+.claude/settings.local.json

@@ -168,7 +168,7 @@ export async function runJobSpy(
     list: options.locations,
     single: options.location,
     env: process.env.JOBSPY_LOCATION,
-    fallback: "UK",
+    fallback: options.countryIndeed ?? process.env.JOBSPY_COUNTRY_INDEED ?? "UK",
   });
   const countryIndeed =
     options.countryIndeed ?? process.env.JOBSPY_COUNTRY_INDEED ?? "UK";

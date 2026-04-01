@@ -164,9 +164,11 @@ INSTRUCTIONS:
 1. Identify recurring job titles, role names, technologies, frameworks, and domain keywords that appear across these JDs.
 2. Return ONLY terms that are NOT already in the existing search terms list above.
 3. Prefer 2-4 word search-friendly phrases (e.g. "machine learning engineer", "data platform", "MLOps").
-4. Include alternative titles and abbreviations (e.g. "SDE", "SWE", "co-op").
-5. Assign a confidence score from 0.0 to 1.0 based on how frequently and prominently the term appears.
-6. Return at most 10 terms per batch.
+4. Focus on ADJACENT ROLES and RELATED DOMAINS the candidate might not have searched for yet. The extractor already handles abbreviations (SWE/SDE) and word variations (analyst/analytics) automatically — do NOT waste slots on those.
+5. Good examples: "data analyst" is already searched → suggest "business intelligence", "product analyst", "quantitative researcher". "machine learning" is searched → suggest "applied scientist", "research engineer", "ML infrastructure".
+6. Bad examples (DO NOT suggest): minor spelling/abbreviation variants of existing terms, overly generic terms like "engineer" or "intern", or terms too niche to appear on job boards.
+7. Assign a confidence score from 0.0 to 1.0 based on how relevant the term is to the candidate's profile AND how likely it is to surface new, unseen job listings.
+8. Return at most 15 terms per batch.
 
 IMPORTANT: Respond with ONLY a valid JSON object. No markdown, no code fences, no explanation outside the JSON.
 

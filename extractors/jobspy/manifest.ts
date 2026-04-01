@@ -30,7 +30,9 @@ export const manifest: ExtractorManifest = {
       sites,
       searchTerms: context.searchTerms,
       location:
-        context.settings.searchCities ?? context.settings.jobspyLocation,
+        context.settings.searchCities ||
+        context.settings.jobspyLocation ||
+        context.selectedCountry,
       resultsWanted: context.settings.jobspyResultsWanted
         ? parseInt(context.settings.jobspyResultsWanted, 10)
         : undefined,

@@ -46,14 +46,88 @@ export interface SimplifyJobsRunResult {
   error?: string;
 }
 
+/** Common abbreviation/synonym pairs for job search. Both directions are checked. */
+const SYNONYM_PAIRS: ReadonlyArray<[string, string]> = [
+  ["ml", "machine learning"],
+  ["ai", "artificial intelligence"],
+  ["nlp", "natural language processing"],
+  ["cv", "computer vision"],
+  ["swe", "software engineer"],
+  ["sde", "software development engineer"],
+  ["fe", "frontend"],
+  ["be", "backend"],
+  ["ds", "data science"],
+  ["da", "data analyst"],
+  ["de", "data engineer"],
+  ["pm", "product manager"],
+  ["devops", "dev ops"],
+  ["mlops", "ml ops"],
+  ["qa", "quality assurance"],
+  ["ux", "user experience"],
+  ["ui", "user interface"],
+  ["dl", "deep learning"],
+  ["rl", "reinforcement learning"],
+  ["llm", "large language model"],
+];
+
+/** Build a lookup from each term to its synonyms. */
+function buildSynonymMap(): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  for (const [a, b] of SYNONYM_PAIRS) {
+    map.set(a, [...(map.get(a) ?? []), b]);
+    map.set(b, [...(map.get(b) ?? []), a]);
+  }
+  return map;
+}
+
+const synonymMap = buildSynonymMap();
+
+/** Tokenize a string into lowercase words. */
+function tokenize(text: string): string[] {
+  return text.toLowerCase().split(/[\s/,;()\-_]+/).filter(Boolean);
+}
+
+/**
+ * Check if a search term matches the listing.
+ * Strategy:
+ *  1. Exact substring match (original behavior)
+ *  2. Prefix match on tokens ("analyst" matches "analytics")
+ *  3. Synonym expansion ("ml" matches "machine learning")
+ */
 function matchesSearchTerms(
   listing: SimplifyJobsListing,
   terms: string[],
 ): boolean {
   if (terms.length === 0) return true;
+
   const haystack =
     `${listing.title} ${listing.company_name} ${listing.category ?? ""}`.toLowerCase();
-  return terms.some((term) => haystack.includes(term.toLowerCase()));
+  const haystackTokens = tokenize(haystack);
+
+  return terms.some((rawTerm) => {
+    const term = rawTerm.toLowerCase().trim();
+    if (!term) return false;
+
+    // 1. Exact substring match
+    if (haystack.includes(term)) return true;
+
+    // 2. Token prefix match — each word in the search term must prefix-match a haystack word
+    const termTokens = tokenize(term);
+    const allTokensMatch = termTokens.length > 0 && termTokens.every((tt) =>
+      haystackTokens.some((ht) => ht.startsWith(tt) || tt.startsWith(ht)),
+    );
+    if (allTokensMatch) return true;
+
+    // 3. Synonym expansion — check if any synonym of the term matches
+    const synonyms = synonymMap.get(term);
+    if (synonyms) {
+      for (const syn of synonyms) {
+        if (haystack.includes(syn)) return true;
+      }
+    }
+
+    return false;
+  });
 }
 
 function toCreateJobInput(listing: SimplifyJobsListing): CreateJobInput {
